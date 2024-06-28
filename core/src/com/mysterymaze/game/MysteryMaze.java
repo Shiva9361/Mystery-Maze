@@ -7,25 +7,30 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MysteryMaze extends ApplicationAdapter {
 	SpriteBatch batch;
-	Texture img;
-	
+	Texture wall_texture;
+	Texture path_texture;
+	Maze maze;
+
 	@Override
-	public void create () {
+	public void create() {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		wall_texture = new Texture("V01_Tile1.png");
+		path_texture = new Texture("V01_Tile3.png");
+		maze = new Maze(16, 16, 16);
 	}
 
 	@Override
-	public void render () {
-		ScreenUtils.clear(1, 0, 0, 1);
+	public void render() {
+		ScreenUtils.clear(0, 0, 0, 1);
 		batch.begin();
-		batch.draw(img, 0, 0);
+		maze.render(batch, wall_texture, path_texture);
 		batch.end();
 	}
-	
+
 	@Override
-	public void dispose () {
+	public void dispose() {
 		batch.dispose();
-		img.dispose();
+		wall_texture.dispose();
+		path_texture.dispose();
 	}
 }
