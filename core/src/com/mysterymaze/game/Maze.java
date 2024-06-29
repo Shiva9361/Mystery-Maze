@@ -8,20 +8,30 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Maze {
     private static final int S = 1;
     private static final int E = 2;
+    private static final int WALL = 1;
+    private static final int SPIKE = 4;
+    private static final int KEY = 7;
 
-    private int[][] maze;
+    protected int[][] maze;
+    protected int[][] playerMaze;
     private int cellSize;
     private int height;
     private int width;
     private Random rand;
+    private int key;
+    public boolean keyObtained;
 
     public Maze(int _cellSize, int _height, int _width) {
         cellSize = _cellSize;
         height = _height;
         width = _width;
         maze = new int[height][width];
+        playerMaze = new int[2 * height + 1][2 * width + 1];
         rand = new Random();
+        key = 1;
         generateMaze(1, 1, height - 1, width - 1);
+        initializePlayerMaze();
+        keyObtained = false;
     }
 
     private void generateMaze(int x, int y, int width, int height) {
@@ -50,6 +60,12 @@ public class Maze {
         for (int i = 0; i < wallLength; i++) {
             if ((wallX != gapX || wallY != gapY) && wallX < this.width && wallY < this.height) {
                 maze[wallX][wallY] |= dir;
+                if (rand.nextDouble() < .025) {
+                    maze[wallX][wallY] = SPIKE;
+                } else if (rand.nextDouble() < .1 && key > 0) {
+                    key = 0;
+                    maze[wallX][wallY] = KEY;
+                }
             }
             wallX += deltaX;
             wallY += deltaY;
@@ -72,7 +88,22 @@ public class Maze {
         generateMaze(nextX, nextY, nextWidth, nextHeight);
     }
 
-    public void render(SpriteBatch batch, Texture wallTexture, Texture pathTexture) {
+    private void initializePlayerMaze() {
+        for (int x = 0; x < height; x++) {
+            for (int y = 0; y < width; y++) {
+                if (maze[x][y] == S) {
+                    playerMaze[2 * x][2 * y] = playerMaze[2 * x][2 * y + 1] = 1;
+                } else if (maze[x][y] == E) {
+                    playerMaze[2 * x][2 * y] = playerMaze[2 * x + 1][2 * y] = 1;
+                } else if (maze[x][y] == SPIKE || maze[x][y] == KEY) {
+                    playerMaze[2 * x][2 * y] = maze[x][y];
+                }
+            }
+        }
+    }
+
+    public void render(SpriteBatch batch, Texture wallTexture, Texture pathTexture, Texture spikeTexture,
+            Texture keyTexture) {
         for (int x = 0; x < 2 * height + 1; x++) {
             for (int y = 0; y < 2 * width + 1; y++) {
                 batch.draw(pathTexture, x * cellSize, y * cellSize, cellSize, cellSize);
@@ -81,17 +112,17 @@ public class Maze {
                 }
             }
         }
-        for (int x = 0; x < height; x++) {
-            for (int y = 0; y < width; y++) {
-                Texture texture = (maze[x][y] == S || maze[x][y] == E) ? wallTexture : pathTexture;
-                if (maze[x][y] == S) {
-                    batch.draw(texture, 2 * x * cellSize, 2 * y * cellSize, cellSize, cellSize);
-                    batch.draw(texture, 2 * x * cellSize, 2 * y * cellSize + cellSize, cellSize, cellSize);
-                } else if (maze[x][y] == E) {
-                    batch.draw(texture, 2 * x * cellSize, 2 * y * cellSize, cellSize, cellSize);
-                    batch.draw(texture, 2 * x * cellSize + cellSize, 2 * y * cellSize, cellSize, cellSize);
+        for (int x = 0; x < 2 * height + 1; x++) {
+            for (int y = 0; y < 2 * width + 1; y++) {
+                if (playerMaze[x][y] == WALL) {
+                    batch.draw(wallTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                } else if (playerMaze[x][y] == SPIKE) {
+                    batch.draw(spikeTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                } else if (playerMaze[x][y] == KEY) {
+                    batch.draw(keyTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 }
             }
         }
+
     }
 }
