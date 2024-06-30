@@ -8,9 +8,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Maze {
     private static final int S = 1;
     private static final int E = 2;
-    private static final int WALL = 1;
-    private static final int SPIKE = 4;
-    private static final int KEY = 7;
+    public static final int WALL = 1;
+    public static final int SPIKE = 4;
+    public static final int KEY = 7;
 
     protected int[][] maze;
     protected int[][] playerMaze;
