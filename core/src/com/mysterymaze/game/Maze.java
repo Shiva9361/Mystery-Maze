@@ -4,13 +4,18 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class Maze {
     private static final int S = 1;
     private static final int E = 2;
+    private static final int MIN_ENEMY_DISTANCE = 10;
     public static final int WALL = 1;
     public static final int SPIKE = 4;
     public static final int KEY = 7;
+    public static final int PATH = 0;
+    public static final int COIN = 3;
 
     protected int[][] maze;
     protected int[][] playerMaze;
@@ -21,7 +26,7 @@ public class Maze {
     private int key;
     public boolean keyObtained;
 
-    public Maze(int _cellSize, int _height, int _width) {
+    public Maze(int _cellSize, int _height, int _width, Array<Vector2> enemySpawns) {
         cellSize = _cellSize;
         height = _height;
         width = _width;
@@ -29,8 +34,8 @@ public class Maze {
         playerMaze = new int[2 * height + 1][2 * width + 1];
         rand = new Random();
         key = 1;
-        generateMaze(1, 1, height - 1, width - 1);
-        initializePlayerMaze();
+        generateMaze(1, 0, height, width);
+        initializePlayerMaze(enemySpawns);
         keyObtained = false;
     }
 
@@ -59,7 +64,10 @@ public class Maze {
         int dir = horizontalDivide ? S : E;
         for (int i = 0; i < wallLength; i++) {
             if ((wallX != gapX || wallY != gapY) && wallX < this.width && wallY < this.height) {
-                maze[wallX][wallY] |= dir;
+                if (maze[wallX][wallY] != 0) {
+                    continue;
+                }
+                maze[wallX][wallY] = dir;
                 if (rand.nextDouble() < .025) {
                     maze[wallX][wallY] = SPIKE;
                 } else if (rand.nextDouble() < .1 && key > 0) {
@@ -88,7 +96,8 @@ public class Maze {
         generateMaze(nextX, nextY, nextWidth, nextHeight);
     }
 
-    private void initializePlayerMaze() {
+    private void initializePlayerMaze(Array<Vector2> enemySpawns) {
+        int enemies = rand.nextInt(10);
         for (int x = 0; x < height; x++) {
             for (int y = 0; y < width; y++) {
                 if (maze[x][y] == S) {
@@ -97,30 +106,67 @@ public class Maze {
                     playerMaze[2 * x][2 * y] = playerMaze[2 * x + 1][2 * y] = 1;
                 } else if (maze[x][y] == SPIKE || maze[x][y] == KEY) {
                     playerMaze[2 * x][2 * y] = maze[x][y];
+                } else if (maze[x][y] == Maze.PATH) {
+                    if (x > 5 && y > 5) {
+                        if (enemies > 0) {
+                            Vector2 position = new Vector2(x, y);
+                            if (isFarFromOtherSpawns(position, enemySpawns)) {
+                                enemySpawns.add(position);
+                                enemies--;
+                            } else {
+                                if (rand.nextDouble() < .3) {
+                                    playerMaze[2 * x][2 * y] = COIN;
+                                }
+                            }
+                        } else {
+                            if (rand.nextDouble() < .3) {
+                                playerMaze[2 * x][2 * y] = COIN;
+                            }
+                        }
+                    } else {
+                        if (rand.nextDouble() < .5) {
+                            playerMaze[2 * x][2 * y] = COIN;
+                        }
+                    }
                 }
             }
         }
     }
 
+    private boolean isFarFromOtherSpawns(Vector2 newSpawn, Array<Vector2> enemySpawns) {
+        for (Vector2 spawn : enemySpawns) {
+            if (manhattanDistance(spawn, newSpawn) < MIN_ENEMY_DISTANCE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int manhattanDistance(Vector2 a, Vector2 b) {
+        return (int) (Math.abs(a.x - b.x) + Math.abs(a.y - b.y));
+    }
+
     public void render(SpriteBatch batch, Texture wallTexture, Texture pathTexture, Texture spikeTexture,
-            Texture keyTexture) {
+            Texture keyTexture, Texture coinTexture) {
         for (int x = 0; x < 2 * height + 1; x++) {
             for (int y = 0; y < 2 * width + 1; y++) {
                 batch.draw(pathTexture, x * cellSize, y * cellSize, cellSize, cellSize);
-                if (x == 0 || y == 0 || x == 2 * height || y == 2 * width) {
-                    batch.draw(wallTexture, x * cellSize, y * cellSize, cellSize, cellSize);
-                }
             }
         }
         for (int x = 0; x < 2 * height + 1; x++) {
             for (int y = 0; y < 2 * width + 1; y++) {
-                if (playerMaze[x][y] == WALL) {
+                if (x == 0 || y == 0 || x == 2 * height || y == 2 * width) {
+                    batch.draw(wallTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                } else if (playerMaze[x][y] == WALL) {
                     batch.draw(wallTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 } else if (playerMaze[x][y] == SPIKE) {
                     batch.draw(spikeTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 } else if (playerMaze[x][y] == KEY) {
                     batch.draw(keyTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                } else if (playerMaze[x][y] == COIN) {
+                    batch.draw(coinTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 }
+
             }
         }
 
