@@ -15,7 +15,7 @@ public class Player {
     private int X;
     private int Y;
     public int lives;
-    private int score;
+    public int score;
 
     Player(int _leftBound, int _rightBound, int _upBound, int _downBound, int _cellSize) {
         X = 1;
@@ -31,16 +31,16 @@ public class Player {
     public void move(Maze maze) {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.W) && (Y < upBound)
-                && (maze.playerMaze[X][Y + 1] != 1)) {
+                && (maze.playerMaze[X][Y + 1] != Maze.WALL)) {
             Y += 1;
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.D) && (X < rightBound)
-                && (maze.playerMaze[X + 1][Y] != 1)) {
+                && (maze.playerMaze[X + 1][Y] != Maze.WALL)) {
             X += 1;
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.A) && (X > leftBound)
-                && (maze.playerMaze[X - 1][Y] != 1)) {
+                && (maze.playerMaze[X - 1][Y] != Maze.WALL)) {
             X -= 1;
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.S) && (Y > downBound)
-                && (maze.playerMaze[X][Y - 1] != 1)) {
+                && (maze.playerMaze[X][Y - 1] != Maze.WALL)) {
             Y -= 1;
         }
 
@@ -61,5 +61,9 @@ public class Player {
     public void reset() {
         X = 1;
         Y = 1;
+    }
+
+    public int getScore() {
+        return score;
     }
 }
