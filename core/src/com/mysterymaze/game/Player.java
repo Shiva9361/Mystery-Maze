@@ -89,6 +89,10 @@ public class Player {
         }
     }
 
+    public void goBack() {
+        Y -= 1;
+    }
+
     private int manhattanDistanceFromBomb(Enemy enemy) {
         int x = enemy.getX();
         int y = enemy.getY();

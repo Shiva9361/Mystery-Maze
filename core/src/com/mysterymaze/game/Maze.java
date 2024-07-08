@@ -18,6 +18,8 @@ public class Maze {
     public static final int COIN = 3;
     public static final int DOOR = 9;
     public static final int BOMBFLASH = 5;
+    public static final int TREASURE = 13;
+    public static final int TREASUREOPEN = 14;
 
     protected int[][] maze;
     protected int[][] playerMaze;
@@ -76,6 +78,8 @@ public class Maze {
                         && (wallX != 0 && wallY != 0 && wallX != height - 1 && wallY != width - 1)) {
                     key = 0;
                     maze[wallX][wallY] = KEY;
+                } else if (rand.nextDouble() < .05) {
+                    maze[wallX][wallY] = TREASURE;
                 }
             }
             wallX += deltaX;
@@ -109,6 +113,8 @@ public class Maze {
                     playerMaze[2 * x][2 * y] = playerMaze[2 * x + 1][2 * y] = 1;
                 } else if (maze[x][y] == SPIKE || maze[x][y] == KEY) {
                     playerMaze[2 * x][2 * y] = maze[x][y];
+                } else if (maze[x][y] == TREASURE) {
+                    playerMaze[2 * x][2 * y] = TREASURE;
                 } else if (maze[x][y] == Maze.PATH) {
                     if (x > 5 && y > 5) {
                         if (enemies > 0) {
@@ -161,7 +167,8 @@ public class Maze {
     }
 
     public void render(SpriteBatch batch, Texture wallTexture, Texture pathTexture, Texture spikeTexture,
-            Texture keyTexture, Texture coinTexture, Texture doorTexture, Texture bombFlashTexture) {
+            Texture keyTexture, Texture coinTexture, Texture doorTexture, Texture bombFlashTexture,
+            Texture treasureTexture, Texture treasureOpenTexture) {
         for (int x = 0; x < 2 * height + 1; x++) {
             for (int y = 0; y < 2 * width + 1; y++) {
                 batch.draw(pathTexture, x * cellSize, y * cellSize, cellSize, cellSize);
@@ -186,8 +193,11 @@ public class Maze {
                     batch.draw(coinTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 } else if (playerMaze[x][y] == BOMBFLASH) {
                     batch.draw(bombFlashTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                } else if (playerMaze[x][y] == TREASURE) {
+                    batch.draw(treasureTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                } else if (playerMaze[x][y] == TREASUREOPEN) {
+                    batch.draw(treasureOpenTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 }
-
             }
         }
 

@@ -23,6 +23,8 @@ public class Level implements Screen {
     Texture doorTexture;
     Texture bombTexture;
     Texture bombFlashTexture;
+    Texture treasureTexture;
+    Texture treasureOpenTexture;
 
     Maze maze;
     Player player;
@@ -46,6 +48,8 @@ public class Level implements Screen {
         doorTexture = new Texture("V01_Door.png");
         bombTexture = new Texture("V01_Bomb.png");
         bombFlashTexture = new Texture("V01_Bomb_Flash.png");
+        treasureTexture = new Texture("V01_Chest.png");
+        treasureOpenTexture = new Texture("V01_Chest_Open.png");
 
         enemies = new Array<>();
         Array<Vector2> enemySpawns = new Array<>();
@@ -73,7 +77,7 @@ public class Level implements Screen {
         game.batch.begin();
 
         maze.render(game.batch, wallTexture, pathTexture, spikeTexture, keyTexture, coinTexture, doorTexture,
-                bombFlashTexture);
+                bombFlashTexture, treasureTexture, treasureOpenTexture);
         game.bigFont.draw(game.batch, "Mystery Maze", 20, 580);
         game.font.draw(game.batch, "Time: " + timer, 370, 590);
         game.font.draw(game.batch, "Score: " + player.getScore(), 370, 570);
@@ -103,7 +107,13 @@ public class Level implements Screen {
                 if (maze.keyObtained) {
                     game.setScreen(new Level(game, player.lives, player.score + (int) timer * 100));
                     dispose();
+                } else {
+                    player.goBack();
                 }
+                break;
+            case Maze.TREASURE:
+                player.score += 100;
+                maze.playerMaze[playerX][playerY] = Maze.TREASUREOPEN;
             default:
                 break;
         }
