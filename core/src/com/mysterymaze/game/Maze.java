@@ -150,6 +150,9 @@ public class Maze {
 
         int doorX = rand.nextInt(2 * width);
         int doorY = 2 * width;
+        if (doorX == 0) {
+            doorX++;
+        }
         playerMaze[doorX][doorY] = DOOR;
     }
 
