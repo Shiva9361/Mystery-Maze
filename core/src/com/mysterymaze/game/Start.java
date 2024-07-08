@@ -3,13 +3,17 @@ package com.mysterymaze.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Start implements Screen {
     private final MysteryMaze game;
+    Sound sound;
 
     public Start(MysteryMaze _game) {
         game = _game;
+        sound = Gdx.audio.newSound(Gdx.files.internal("start.ogg"));
+        sound.loop();
     }
 
     @Override
@@ -47,5 +51,6 @@ public class Start implements Screen {
 
     @Override
     public void dispose() {
+        sound.dispose();
     }
 }

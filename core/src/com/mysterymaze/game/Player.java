@@ -2,6 +2,7 @@ package com.mysterymaze.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,6 +13,7 @@ public class Player {
     private int Y;
     private int bombX;
     private int bombY;
+    private Sound moveSound;
 
     public float bombTimer;
     public float flashTimer;
@@ -30,6 +32,7 @@ public class Player {
         lives = _lives;
         score = _score;
         bombs = 5;
+        moveSound = Gdx.audio.newSound(Gdx.files.internal("move.wav"));
     }
 
     public void move(Maze maze) {
@@ -37,15 +40,19 @@ public class Player {
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)
                 && (maze.playerMaze[X][Y + 1] != Maze.WALL)) {
             Y += 1;
+            moveSound.play();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.D)
                 && (maze.playerMaze[X + 1][Y] != Maze.WALL)) {
             X += 1;
+            moveSound.play();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.A)
                 && (maze.playerMaze[X - 1][Y] != Maze.WALL)) {
             X -= 1;
+            moveSound.play();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.S)
                 && (maze.playerMaze[X][Y - 1] != Maze.WALL)) {
             Y -= 1;
+            moveSound.play();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !bombPresent && !flashPresent && bombs > 0) {
             bombX = X;
             bombY = Y;
