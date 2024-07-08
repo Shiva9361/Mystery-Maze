@@ -19,7 +19,7 @@ public class Start implements Screen {
         game.bigFont.draw(game.batch, "Welcome to Mystery Maze", 75, 400);
         game.font.draw(game.batch, "Press Space to start", 290, 325);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            game.setScreen(new Level(game));
+            game.setScreen(new Level(game, 5, 0));
             dispose();
         }
         game.batch.end();

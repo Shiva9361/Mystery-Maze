@@ -19,7 +19,7 @@ public class GameOver implements Screen {
         game.bigFont.draw(game.batch, "Game Over", 150, 400);
         game.font.draw(game.batch, "Press Space to restart", 290, 325);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            game.setScreen(new Level(game));
+            game.setScreen(new Level(game, 5, 0));
             dispose();
         }
         game.batch.end();

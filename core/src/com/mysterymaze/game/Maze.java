@@ -16,6 +16,7 @@ public class Maze {
     public static final int KEY = 7;
     public static final int PATH = 0;
     public static final int COIN = 3;
+    public static final int DOOR = 9;
 
     protected int[][] maze;
     protected int[][] playerMaze;
@@ -36,7 +37,8 @@ public class Maze {
         key = 1;
         generateMaze(1, 0, height, width);
         initializePlayerMaze(enemySpawns);
-        keyObtained = false;
+        System.out.println(key);
+        keyObtained = key == 0 ? false : true;
     }
 
     private void generateMaze(int x, int y, int width, int height) {
@@ -70,7 +72,8 @@ public class Maze {
                 maze[wallX][wallY] = dir;
                 if (rand.nextDouble() < .025) {
                     maze[wallX][wallY] = SPIKE;
-                } else if (rand.nextDouble() < .1 && key > 0) {
+                } else if (rand.nextDouble() < .1 && key > 0
+                        && (wallX != 0 && wallY != 0 && wallX != height - 1 && wallY != width - 1)) {
                     key = 0;
                     maze[wallX][wallY] = KEY;
                 }
@@ -131,6 +134,17 @@ public class Maze {
                 }
             }
         }
+        for (int x = 0; x < 2 * height + 1; x++) {
+            for (int y = 0; y < 2 * width + 1; y++) {
+                if (x == 0 || y == 0 || x == 2 * height || y == 2 * width) {
+                    playerMaze[x][y] = WALL;
+                }
+            }
+        }
+
+        int doorX = rand.nextInt(2 * width);
+        int doorY = 2 * width;
+        playerMaze[doorX][doorY] = DOOR;
     }
 
     private boolean isFarFromOtherSpawns(Vector2 newSpawn, Array<Vector2> enemySpawns) {
@@ -147,16 +161,21 @@ public class Maze {
     }
 
     public void render(SpriteBatch batch, Texture wallTexture, Texture pathTexture, Texture spikeTexture,
-            Texture keyTexture, Texture coinTexture) {
+            Texture keyTexture, Texture coinTexture, Texture doorTexture) {
         for (int x = 0; x < 2 * height + 1; x++) {
             for (int y = 0; y < 2 * width + 1; y++) {
                 batch.draw(pathTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+
             }
         }
         for (int x = 0; x < 2 * height + 1; x++) {
             for (int y = 0; y < 2 * width + 1; y++) {
                 if (x == 0 || y == 0 || x == 2 * height || y == 2 * width) {
-                    batch.draw(wallTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                    if (playerMaze[x][y] == DOOR) {
+                        batch.draw(doorTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                    } else {
+                        batch.draw(wallTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
                 } else if (playerMaze[x][y] == WALL) {
                     batch.draw(wallTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 } else if (playerMaze[x][y] == SPIKE) {

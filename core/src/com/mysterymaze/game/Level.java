@@ -19,16 +19,17 @@ public class Level implements Screen {
     Texture keyTexture;
     Texture enemyTexture;
     Texture coinTexture;
+    Texture doorTexture;
     Maze maze;
     Player player;
     Array<Enemy> enemies;
     OrthographicCamera camera;
     float enemy_refresh;
 
-    public Level(final MysteryMaze _game) {
+    public Level(final MysteryMaze _game, int _playerLives, int _playerScore) {
         game = _game;
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 600, 600);
+        camera.setToOrtho(false, 530, 600);
 
         wallTexture = new Texture("V01_Tile1.png");
         pathTexture = new Texture("V01_Tile3.png");
@@ -37,11 +38,12 @@ public class Level implements Screen {
         keyTexture = new Texture("V01_Key.png");
         enemyTexture = new Texture("V01_Enemy.png");
         coinTexture = new Texture("V01_Coin.png");
+        doorTexture = new Texture("V01_Door.png");
 
         enemies = new Array<>();
         Array<Vector2> enemySpawns = new Array<>();
         maze = new Maze(16, 16, 16, enemySpawns);
-        player = new Player(1, 31, 31, 1, 16);
+        player = new Player(16, _playerLives, _playerScore);
         for (Vector2 position : enemySpawns) {
             enemies.add(new Enemy(1, 31, 31, 1, 16, position));
         }
@@ -56,7 +58,11 @@ public class Level implements Screen {
 
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        maze.render(game.batch, wallTexture, pathTexture, spikeTexture, keyTexture, coinTexture);
+
+        maze.render(game.batch, wallTexture, pathTexture, spikeTexture, keyTexture, coinTexture, doorTexture);
+        game.bigFont.draw(game.batch, "Mystery Maze", 20, 580);
+        game.font.draw(game.batch, "Score: " + player.getScore(), 400, 570);
+        game.font.draw(game.batch, "Lives: " + player.lives, 400, 550);
         player.move(maze);
         int playerX = player.getX();
         int playerY = player.getY();
@@ -77,6 +83,11 @@ public class Level implements Screen {
                 player.score += 10;
                 maze.playerMaze[playerX][playerY] = 0;
                 break;
+            case Maze.DOOR:
+                if (maze.keyObtained) {
+                    game.setScreen(new Level(game, player.lives, player.score));
+                    dispose();
+                }
             default:
                 break;
         }
