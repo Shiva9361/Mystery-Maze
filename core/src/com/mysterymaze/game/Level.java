@@ -12,6 +12,7 @@ public class Level implements Screen {
     final MysteryMaze game;
 
     SpriteBatch batch;
+
     Texture wallTexture;
     Texture pathTexture;
     Texture playerTexture;
@@ -20,6 +21,9 @@ public class Level implements Screen {
     Texture enemyTexture;
     Texture coinTexture;
     Texture doorTexture;
+    Texture bombTexture;
+    Texture bombFlashTexture;
+
     Maze maze;
     Player player;
     Array<Enemy> enemies;
@@ -39,6 +43,8 @@ public class Level implements Screen {
         enemyTexture = new Texture("V01_Enemy.png");
         coinTexture = new Texture("V01_Coin.png");
         doorTexture = new Texture("V01_Door.png");
+        bombTexture = new Texture("V01_Bomb.png");
+        bombFlashTexture = new Texture("V01_Bomb_Flash.png");
 
         enemies = new Array<>();
         Array<Vector2> enemySpawns = new Array<>();
@@ -59,10 +65,12 @@ public class Level implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
 
-        maze.render(game.batch, wallTexture, pathTexture, spikeTexture, keyTexture, coinTexture, doorTexture);
+        maze.render(game.batch, wallTexture, pathTexture, spikeTexture, keyTexture, coinTexture, doorTexture,
+                bombFlashTexture);
         game.bigFont.draw(game.batch, "Mystery Maze", 20, 580);
-        game.font.draw(game.batch, "Score: " + player.getScore(), 400, 570);
-        game.font.draw(game.batch, "Lives: " + player.lives, 400, 550);
+        game.font.draw(game.batch, "Score: " + player.getScore(), 370, 570);
+        game.font.draw(game.batch, "Lives: " + player.lives, 370, 550);
+        game.font.draw(game.batch, "Bombs: " + player.bombs, 430, 550);
         player.move(maze);
         int playerX = player.getX();
         int playerY = player.getY();
@@ -91,7 +99,20 @@ public class Level implements Screen {
             default:
                 break;
         }
-        player.render(game.batch, playerTexture);
+        player.render(game.batch, playerTexture, bombTexture);
+        if (player.bombPresent) {
+            player.bombTimer -= delta;
+            if (player.bombTimer <= 0) {
+                player.blast(maze, enemies);
+                player.removeBomb();
+            }
+        }
+        if (player.flashPresent) {
+            player.flashTimer -= delta;
+            if (player.flashTimer <= 0) {
+                player.removeFlash(maze);
+            }
+        }
         if (enemy_refresh > .4) {
             enemy_refresh = 0;
             for (Enemy enemy : enemies) {
@@ -100,8 +121,12 @@ public class Level implements Screen {
         }
         for (Enemy enemy : enemies) {
             if (enemy.getX() == player.getX() && enemy.getY() == player.getY()) {
-                game.setScreen(new GameOver(game));
-                dispose();
+                player.lives -= 1;
+                if (player.lives <= 0) {
+                    game.setScreen(new GameOver(game));
+                    dispose();
+                }
+                player.reset();
             }
             enemy.render(game.batch, enemyTexture);
         }

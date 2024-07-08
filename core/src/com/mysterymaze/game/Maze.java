@@ -17,6 +17,7 @@ public class Maze {
     public static final int PATH = 0;
     public static final int COIN = 3;
     public static final int DOOR = 9;
+    public static final int BOMBFLASH = 5;
 
     protected int[][] maze;
     protected int[][] playerMaze;
@@ -37,7 +38,6 @@ public class Maze {
         key = 1;
         generateMaze(1, 0, height, width);
         initializePlayerMaze(enemySpawns);
-        System.out.println(key);
         keyObtained = key == 0 ? false : true;
     }
 
@@ -161,7 +161,7 @@ public class Maze {
     }
 
     public void render(SpriteBatch batch, Texture wallTexture, Texture pathTexture, Texture spikeTexture,
-            Texture keyTexture, Texture coinTexture, Texture doorTexture) {
+            Texture keyTexture, Texture coinTexture, Texture doorTexture, Texture bombFlashTexture) {
         for (int x = 0; x < 2 * height + 1; x++) {
             for (int y = 0; y < 2 * width + 1; y++) {
                 batch.draw(pathTexture, x * cellSize, y * cellSize, cellSize, cellSize);
@@ -184,10 +184,19 @@ public class Maze {
                     batch.draw(keyTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 } else if (playerMaze[x][y] == COIN) {
                     batch.draw(coinTexture, x * cellSize, y * cellSize, cellSize, cellSize);
+                } else if (playerMaze[x][y] == BOMBFLASH) {
+                    batch.draw(bombFlashTexture, x * cellSize, y * cellSize, cellSize, cellSize);
                 }
 
             }
         }
 
+    }
+
+    public void updatePlayerMaze(int x, int y, int val) {
+        if (x <= 0 || y <= 0 || x >= 2 * height || y >= 2 * width) {
+            return;
+        }
+        playerMaze[x][y] = val;
     }
 }
