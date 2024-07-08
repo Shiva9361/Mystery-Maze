@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 
 public class Level implements Screen {
     final MysteryMaze game;
@@ -25,6 +27,10 @@ public class Level implements Screen {
     Texture bombFlashTexture;
     Texture treasureTexture;
     Texture treasureOpenTexture;
+
+    Sound treasureSound;
+    Sound coinSound;
+    Sound doorSound;
 
     Maze maze;
     Player player;
@@ -50,6 +56,10 @@ public class Level implements Screen {
         bombFlashTexture = new Texture("V01_Bomb_Flash.png");
         treasureTexture = new Texture("V01_Chest.png");
         treasureOpenTexture = new Texture("V01_Chest_Open.png");
+
+        treasureSound = Gdx.audio.newSound(Gdx.files.internal("coin.wav"));
+        coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.wav"));
+        doorSound = Gdx.audio.newSound(Gdx.files.internal("door.wav"));
 
         enemies = new Array<>();
         Array<Vector2> enemySpawns = new Array<>();
@@ -102,9 +112,11 @@ public class Level implements Screen {
             case Maze.COIN:
                 player.score += 10;
                 maze.playerMaze[playerX][playerY] = 0;
+                coinSound.play();
                 break;
             case Maze.DOOR:
                 if (maze.keyObtained) {
+                    doorSound.play();
                     game.setScreen(new Level(game, player.lives, player.score + (int) timer * 100));
                     dispose();
                 } else {
@@ -114,6 +126,7 @@ public class Level implements Screen {
             case Maze.TREASURE:
                 player.score += 100;
                 maze.playerMaze[playerX][playerY] = Maze.TREASUREOPEN;
+                treasureSound.play();
             default:
                 break;
         }
@@ -176,5 +189,17 @@ public class Level implements Screen {
         wallTexture.dispose();
         pathTexture.dispose();
         playerTexture.dispose();
+        spikeTexture.dispose();
+        keyTexture.dispose();
+        enemyTexture.dispose();
+        coinTexture.dispose();
+        doorTexture.dispose();
+        bombTexture.dispose();
+        bombFlashTexture.dispose();
+        treasureTexture.dispose();
+        treasureOpenTexture.dispose();
+        doorSound.dispose();
+        treasureSound.dispose();
+        coinSound.dispose();
     }
 }

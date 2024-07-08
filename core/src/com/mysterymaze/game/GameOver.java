@@ -3,15 +3,19 @@ package com.mysterymaze.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameOver implements Screen {
     private final MysteryMaze game;
     private int score;
+    private Sound sound;
 
     public GameOver(MysteryMaze _game, int _score) {
         game = _game;
         score = _score;
+        sound = Gdx.audio.newSound(Gdx.files.internal("GameOver.mp3"));
+        sound.loop();
     }
 
     @Override
@@ -50,5 +54,6 @@ public class GameOver implements Screen {
 
     @Override
     public void dispose() {
+        sound.dispose();
     }
 }
