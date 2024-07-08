@@ -61,7 +61,8 @@ public class Level implements Screen {
     public void render(float delta) {
         timer -= delta;
         if (timer <= 0) {
-            game.setScreen(new GameOver(game));
+            int score = player.score;
+            game.setScreen(new GameOver(game, score));
             dispose();
         }
         enemy_refresh += delta;
@@ -89,7 +90,7 @@ public class Level implements Screen {
             case Maze.SPIKE:
                 player.lives -= 1;
                 if (player.lives <= 0) {
-                    game.setScreen(new GameOver(game));
+                    game.setScreen(new GameOver(game, player.score));
                     dispose();
                 }
                 player.reset();
@@ -100,7 +101,7 @@ public class Level implements Screen {
                 break;
             case Maze.DOOR:
                 if (maze.keyObtained) {
-                    game.setScreen(new Level(game, player.lives, player.score));
+                    game.setScreen(new Level(game, player.lives, player.score + (int) timer * 100));
                     dispose();
                 }
             default:
@@ -130,7 +131,7 @@ public class Level implements Screen {
             if (enemy.getX() == player.getX() && enemy.getY() == player.getY()) {
                 player.lives -= 1;
                 if (player.lives <= 0) {
-                    game.setScreen(new GameOver(game));
+                    game.setScreen(new GameOver(game, player.score));
                     dispose();
                 }
                 player.reset();
