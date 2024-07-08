@@ -83,12 +83,20 @@ public class Player {
                 enemies.removeIndex(i);
             }
         }
+        if (manhattanDistanceFromBomb() <= 2) {
+            lives--;
+            reset();
+        }
     }
 
     private int manhattanDistanceFromBomb(Enemy enemy) {
         int x = enemy.getX();
         int y = enemy.getY();
         return (int) (Math.abs(x - bombX) + Math.abs(y - bombY));
+    }
+
+    private int manhattanDistanceFromBomb() {
+        return (int) (Math.abs(X - bombX) + Math.abs(Y - bombY));
     }
 
     public int getX() {
