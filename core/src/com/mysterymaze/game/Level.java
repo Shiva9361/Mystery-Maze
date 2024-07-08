@@ -12,7 +12,7 @@ public class Level implements Screen {
     final MysteryMaze game;
 
     SpriteBatch batch;
-
+    float timer;
     Texture wallTexture;
     Texture pathTexture;
     Texture playerTexture;
@@ -32,6 +32,7 @@ public class Level implements Screen {
 
     public Level(final MysteryMaze _game, int _playerLives, int _playerScore) {
         game = _game;
+        timer = 60;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 530, 600);
 
@@ -58,6 +59,11 @@ public class Level implements Screen {
 
     @Override
     public void render(float delta) {
+        timer -= delta;
+        if (timer <= 0) {
+            game.setScreen(new GameOver(game));
+            dispose();
+        }
         enemy_refresh += delta;
         ScreenUtils.clear(0, 0, 0, 1);
         camera.update();
@@ -68,6 +74,7 @@ public class Level implements Screen {
         maze.render(game.batch, wallTexture, pathTexture, spikeTexture, keyTexture, coinTexture, doorTexture,
                 bombFlashTexture);
         game.bigFont.draw(game.batch, "Mystery Maze", 20, 580);
+        game.font.draw(game.batch, "Time: " + timer, 370, 590);
         game.font.draw(game.batch, "Score: " + player.getScore(), 370, 570);
         game.font.draw(game.batch, "Lives: " + player.lives, 370, 550);
         game.font.draw(game.batch, "Bombs: " + player.bombs, 430, 550);
