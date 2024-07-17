@@ -9,6 +9,8 @@ Build with
 ```!=bash
 ./gradlew desktop:dist
 ```
+then run the jar file in desktop\build\libs
+
 edit 
 - I was one of the winners
-then run the jar file in desktop\build\libs
+
