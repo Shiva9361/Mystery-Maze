@@ -11,6 +11,5 @@ Build with
 ```
 then run the jar file in desktop\build\libs
 
-edit 
-- I was one of the winners
+## I was one of the winners
 
